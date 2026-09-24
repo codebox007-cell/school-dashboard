@@ -1,39 +1,53 @@
-# Career Tour 2026–27 — School Visit Dashboard
+# Career Tour 2026–27 — School Master Dashboard
 
-A Streamlit dashboard for tracking career-tour school visits: visit status by POC,
-enrollment breakdowns, and a filter to flag schools worth dropping (poor
-infrastructure + low enrollment), plus the original pivot/summary block from
-the sheet preserved as-is.
+A Streamlit dashboard for the full 302-school master list (all 8 zones):
+an interactive map, enrollment breakdowns, tour/diagnosis status, and an
+editable visit tracker.
+
+## Visit tracking
+The "Visit tracking" tab lets you set each school's Visit status
+(Not visited / Scheduled / Completed), POC, visit date, and notes directly
+in the dashboard. It starts pre-filled from the "Career tour already
+conducting" column in your data (already-toured schools default to
+Completed). Click **Save changes** after editing.
+
+Edits are written to `visit_log.csv` on the app's own disk. **This is not
+guaranteed permanent on Streamlit Community Cloud's free tier** — if the
+app restarts (inactivity, redeploy, etc.), disk writes can be lost. Use the
+"Download current visit log as CSV" button regularly as a backup. If this
+tracking becomes important to rely on long-term, the more robust fix is
+connecting the app to a Google Sheet or small database instead of local
+disk — ask if you want that upgrade built.
 
 ## Files
 - `app.py` — the dashboard
 - `requirements.txt` — Python dependencies
-- `data/school_list.csv` — a cleaned (UTF-8) copy of your uploaded sheet, used
-  as the default dataset. You can also upload a different CSV from the app's
-  sidebar at any time, as long as it has the same column headers.
+- `school_master_list.csv` — cleaned copy of the "300 school list" sheet from
+  your workbook. **Keep this file in the same folder as app.py, not in a
+  subfolder** — that's what tripped up the last deploy.
 
 ## Run locally
 ```
-pip install -r requirements.txt
-streamlit run app.py
+pip3 install -r requirements.txt
+python3 -m streamlit run app.py
 ```
 
-## Deploy on Streamlit Community Cloud (free, online)
-1. Create a GitHub repo and push these three items (app.py, requirements.txt,
-   the data folder) to it.
-2. Go to share.streamlit.io and sign in with GitHub.
-3. Click "Create app," pick this repo and `app.py` as the main file, then
-   Deploy.
-4. Any time you push a new commit, the live app updates automatically.
+## Deploy on Streamlit Community Cloud
+1. Push these three files (all in the same top-level folder — no nesting) to
+   a GitHub repo.
+2. Go to share.streamlit.io, sign in with GitHub, click "Create app," pick
+   this repo and `app.py`.
+3. Deploy. Any future git push auto-updates the live app.
 
-## Data notes / assumptions made while cleaning
-- The sheet's "Infrastructure availability" column had inconsistent free-text
-  values (`no`, `Yes`, `TV`, `smart board`, `NOT working`, `STC TV`, etc.).
-  The app buckets these into Working / Not working / Unknown — worth a quick
-  sanity check against the source sheet if precision matters here.
-- One row (Trilokpuri 22 Block) had `#N/A` in Enrollment and "Done" mistakenly
-  entered in the Poc column in the original file — this is left as-is; it will
-  show up as a "Poc" filter option and a blank enrollment value.
-- Rows with no SCHOOL ID (the POC visit-count summary and the shift pivot
-  table at the bottom of the original sheet) are treated as a separate
-  "Original summary" block, not as school records.
+## Notes / assumptions made while cleaning
+- "Career tour already conducting" contained `#N/A` for schools with no tour
+  yet, and an actual site name for schools where one has already happened.
+  This is turned into a simple Yes/No "Tour_status" for filtering — the
+  original site names are still visible in the full data table.
+- "Daignosis" (as spelled in your sheet) had inconsistent casing (`yes` /
+  `Yes`) and many blanks; blanks are treated as "not done."
+- Two schools have no Latitude/Longitude and are excluded from the map only
+  (they still appear in every other tab and the data table).
+- The sheet is titled "300 school list" but actually contains 302 rows (two
+  S.No values are duplicated in the source — SCHOOL ID is unique, so that's
+  used as the reliable identifier).
