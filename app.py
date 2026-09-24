@@ -133,7 +133,7 @@ with tab1:
 
     color_by = st.radio("Color points by", ["ZONE", "Tour_status", "Diagnosis_done", "Near_metro"], horizontal=True)
 
-    fig = px.scatter_mapbox(
+    fig = px.scatter_map(
         mappable,
         lat="Latitude",
         lon="Longitude",
@@ -142,8 +142,9 @@ with tab1:
         hover_data=["ZONE", "Shift", "Gender", "Total", "HoS Name"],
         zoom=9,
         height=600,
+        map_style="open-street-map",
     )
-    fig.update_layout(mapbox_style="open-street-map", margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     st.plotly_chart(fig, use_container_width=True)
 
 # ---------------- Tab 2: Enrollment ----------------
